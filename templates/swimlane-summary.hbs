@@ -1,0 +1,10 @@
+{{#each (limit summary block.userOptions.numTags) as |recordId|}}
+    {{#p-tag acronym=block.acronym}}
+        {{recordId}}
+    {{/p-tag}}
+{{/each}}
+{{#if (gt numAdditionalTags 0)}}
+    {{#p-tag acronym=block.acronym}}
+        +{{numAdditionalTags}}
+    {{/p-tag}}
+{{/if}}

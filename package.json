@@ -1,0 +1,13 @@
+{
+  "main": "./integration.js",
+  "name": "swimlane",
+  "version": "3.0.0-beta",
+  "private": true,
+  "license": "MIT",
+  "author": "Polarity",
+  "dependencies": {
+    "async": "2.1.4",
+    "request": "^2.85.0",
+    "lodash": "4.17.10"
+  }
+}
