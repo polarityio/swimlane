@@ -45,7 +45,11 @@ class Swimlane {
         appIds.push(appId);
       } else {
         // the appName could not be mapped to an app ID
-        return cb('The Application [' + appNames[i].trim() + '] could not be found');
+        return cb({
+            detail: 'The Application [' + appNames[i].trim() + '] could not be found',
+            availableApps: Array.from(this.appNameToId.keys()),
+            note: 'The app names are case insensitive so you do not need to match the casing provided in `availableApps`'
+        });
       }
     }
 
