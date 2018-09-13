@@ -1,7 +1,7 @@
 {
   "main": "./integration.js",
   "name": "swimlane",
-  "version": "3.0.2-beta",
+  "version": "3.0.3-beta",
   "private": true,
   "license": "MIT",
   "author": "Polarity",
@@ -9,5 +9,16 @@
     "async": "2.1.4",
     "request": "^2.85.0",
     "lodash": "4.17.10"
+  },
+  "devDependencies": {
+    "bunyan": "^1.8.12",
+    "chai": "^4.1.2",
+    "mocha": "^5.1.1",
+    "mountebank": "^1.14.0"
+  },
+  "scripts": {
+    "pretest": "mb start --configfile imposters.json --mock &",
+    "test": "mocha --recursive",
+    "posttest": "mb stop"
   }
 }
