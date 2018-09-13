@@ -12,19 +12,24 @@ class Swimlane {
     this.appIdToName = new Map();
     this.appNameToId = new Map();
     this.swimlaneInstanceId = null;
+    this.readyToQuery = false;
     this.log = logger;
     this.request = request;
   }
 
-  init(options) {
-    this.getApps();
-  }
-
   cacheApps(options, cb) {
+    let self = this;
     if (this._doReload(options)) {
       this.log.info('Caching Swimlane Applications');
       this._resetCaches();
       this._cacheApps(options, (err) => {
+        if (!err) {
+          this.log.info(
+            { cachedApps: Array.from(this.appNameToId.keys()) },
+            'Successfully Cached Apps'
+          );
+        }
+        self.readyToQuery = err ? false : true;
         return cb(err);
       });
     } else {
@@ -37,6 +42,12 @@ class Swimlane {
     const appIds = [];
     const results = [];
 
+    if (this.readyToQuery === false) {
+      return cb({
+        detail: 'Cannot run searches due to a failure to load the Swimlane application'
+      });
+    }
+
     let appNames = options.applications.split(',');
 
     for (let i = 0; i < appNames.length; i++) {
@@ -46,9 +57,10 @@ class Swimlane {
       } else {
         // the appName could not be mapped to an app ID
         return cb({
-            detail: 'The Application [' + appNames[i].trim() + '] could not be found',
-            availableApps: Array.from(this.appNameToId.keys()),
-            note: 'The app names are case insensitive so you do not need to match the casing provided in `availableApps`'
+          detail: 'The Application [' + appNames[i].trim() + '] could not be found',
+          availableApps: Array.from(this.appNameToId.keys()),
+          note:
+            'The app names are case insensitive so you do not need to match the casing provided in `availableApps`'
         });
       }
     }
@@ -57,21 +69,22 @@ class Swimlane {
       return cb('You must specify a valid application name');
     }
 
+    const requestOptions = {
+      url: options.url + '/api/search',
+      json: true,
+      method: 'POST',
+      body: { applicationIds: appIds, keywords: entityValue, pageSize: 10 }
+    };
+
+    this.log.debug({ requestOptions: requestOptions }, 'HTTP Request Options');
+
     this._executeRequest(
       options,
-      {
-        url: options.url + '/api/search',
-        json: true,
-        method: 'POST',
-        body: {
-          applicationIds: appIds,
-          keywords: entityValue,
-          pageSize: 10
-        }
-      },
+      requestOptions,
       self._handleRequestError('Searching SwimLane', cb, (response, body) => {
         const entityRegEx = new RegExp(entityValue, 'gi');
         const resultsCount = body.count;
+        const errors = [];
 
         appIds.forEach((appId) => {
           if (Array.isArray(body.results[appId])) {
@@ -85,34 +98,61 @@ class Swimlane {
                 ) {
                   let fieldValue = htmlEscape(value);
                   fieldValue = fieldValue.replace(entityRegEx, '<span class="match">$&</span>');
-                  results.push({
-                    appName: self._getAppName(appId),
-                    appAcronym: self._getApp(appId).acronym,
-                    appId: appId,
-                    fieldId: key,
-                    fieldName: self._getFieldName(appId, key),
-                    layoutPath: self._getLayoutPath(appId, key),
-                    fieldValue: fieldValue,
-                    recordTrackingId: record.trackingId,
-                    recordCreatedDate: record.createdDate,
-                    recordModifiedDate: record.modifiedDate,
-                    recordTotalTimeSpent: record.totalTimeSpent,
-                    recordId: record.id,
-                    recordUrl: self._createRecordUrl(options.url, appId, record.id)
-                  });
+                  let app = self._getApp(appId);
+                  let field = self._getField(appId, key);
+
+                  if (!app) {
+                    // the appId could not be found so we need to return an error
+                    errors.push({
+                      appId: appId,
+                      fieldId: key,
+                      preFormattedFieldValue: value,
+                      formattedFieldValue: fieldValue,
+                      detail: `Could not find the app ${appId}`
+                    });
+                  }
+
+                  if (!field) {
+                    // the field could not be found so we need to return an error
+                    errors.push({
+                      appId: appId,
+                      fieldId: key,
+                      preFormattedFieldValue: value,
+                      formattedFieldValue: fieldValue,
+                      detail: `Could not find field id ${key} in app ${appId}`
+                    });
+                  }
+
+                  if (errors.length === 0) {
+                    results.push({
+                      appName: app.name,
+                      appAcronym: app.acronym,
+                      appId: appId,
+                      fieldId: key,
+                      fieldName: field.name,
+                      layoutPath: self._getLayoutPath(appId, key),
+                      fieldValue: fieldValue,
+                      recordTrackingId: record.trackingId,
+                      recordCreatedDate: record.createdDate,
+                      recordModifiedDate: record.modifiedDate,
+                      recordTotalTimeSpent: record.totalTimeSpent,
+                      recordId: record.id,
+                      recordUrl: self._createRecordUrl(options.url, appId, record.id)
+                    });
+                  }
                 }
               });
             });
           }
         });
 
-        cb(null, results, resultsCount);
+        if (errors.length > 0) {
+          cb({ detail: 'Errors encountered when searching', errors: errors });
+        } else {
+          cb(null, results, resultsCount);
+        }
       })
     );
-  }
-
-  _getAppName(appId) {
-    return this.appIdToName.get(appId).name;
   }
 
   _getAppId(appName) {
@@ -232,7 +272,15 @@ class Swimlane {
   _getFieldName(appId, fieldId) {
     let app = this.appCache.get(appId);
     if (app) {
-      return app.get(fieldId).fieldName;
+      if (!app.has(fieldId)) {
+        this.log.error(
+          { appId: appId, fieldId: fieldId },
+          '[_getFieldName] App does not contain fieldId'
+        );
+        return null;
+      } else {
+        return app.get(fieldId).fieldName;
+      }
     } else {
       return null;
     }
@@ -298,8 +346,6 @@ class Swimlane {
       requestOptions.headers = {
         Authorization: `Bearer ${accessToken}`
       };
-
-      self.log.info(requestOptions);
 
       self.request(requestOptions, (err, response, body) => {
         if (response.statusCode === 401 && requestCount < 2) {
@@ -378,7 +424,7 @@ class Swimlane {
     };
 
     this.request(requestOptions, (err, response, body) => {
-      if (err || response.statusCode != 200) {
+      if (err || response.statusCode != 200 || !body || !body.token) {
         cb({
           err: err,
           response: response,

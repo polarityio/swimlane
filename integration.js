@@ -45,7 +45,7 @@ function doLookup(entities, options, cb) {
         });
       },
       (err) => {
-        Logger.info(results);
+        Logger.trace({results:results}, 'Final Results');
         cb(err, results);
       }
     );
