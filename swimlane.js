@@ -2,6 +2,8 @@ const crypto = require('crypto');
 const _ = require('lodash');
 const htmlEscape = require('./html-escape');
 
+const FIELD_VALUE_TRUNCATION_LENGTH = 2000; // number of characters to truncate to for the field value
+
 class Swimlane {
   constructor(request, logger) {
     this.accessTokenCache = new Map();
@@ -12,7 +14,8 @@ class Swimlane {
     this.appIdToName = new Map();
     this.appNameToId = new Map();
     this.swimlaneInstanceId = null;
-    this.readyToQuery = false;
+    this.isCaching = true;
+    this.cachingAppFailed = false;
     this.log = logger;
     this.request = request;
   }
@@ -29,7 +32,8 @@ class Swimlane {
             'Successfully Cached Apps'
           );
         }
-        self.readyToQuery = err ? false : true;
+        self.cachingAppFailed = err ? true : false;
+        self.isCaching = false;
         return cb(err);
       });
     } else {
@@ -42,10 +46,19 @@ class Swimlane {
     const appIds = [];
     const results = [];
 
-    if (this.readyToQuery === false) {
+    // The app cache did not build correctly we return an error
+    if (this.cachingAppFailed) {
       return cb({
         detail: 'Cannot run searches due to a failure to load the Swimlane application'
       });
+    }
+
+    // The caching operation can take a couple seconds which means search requests can come in before
+    // the app is fully cached.  As a result, we simply return empty results until the app is fully
+    // cached.
+    if (this.isCaching) {
+      this.log.debug(`Cache is still building, skipping search on [${entityValue}]`);
+      return cb(null, []);
     }
 
     let appNames = options.applications.split(',');
@@ -84,7 +97,6 @@ class Swimlane {
       self._handleRequestError('Searching SwimLane', cb, (response, body) => {
         const entityRegEx = new RegExp(entityValue, 'gi');
         const resultsCount = body.count;
-        const errors = [];
 
         appIds.forEach((appId) => {
           if (Array.isArray(body.results[appId])) {
@@ -96,61 +108,59 @@ class Swimlane {
                   typeof value === 'string' &&
                   value.toLowerCase().includes(entityValue.toLowerCase())
                 ) {
-                  let fieldValue = htmlEscape(value);
-                  fieldValue = fieldValue.replace(entityRegEx, '<span class="match">$&</span>');
-                  let app = self._getApp(appId);
-                  let field = self._getField(appId, key);
+                  const fieldValue = this._parseFieldValue(value, entityRegEx);
+                  const app = self._getApp(appId);
+                  const fieldName = self._getFieldName(appId, key);
 
                   if (!app) {
-                    // the appId could not be found so we need to return an error
-                    errors.push({
-                      appId: appId,
-                      fieldId: key,
-                      preFormattedFieldValue: value,
-                      formattedFieldValue: fieldValue,
-                      detail: `Could not find the app ${appId}`
-                    });
+                    // the appId could not be found so we log it
+                    this.log.debug(
+                      {
+                        appId: appId,
+                        fieldId: key,
+                        entityValue: entityValue
+                      },
+                      `Could not find the app ${appId}`
+                    );
+                    return;
                   }
 
-                  if (!field) {
-                    // the field could not be found so we need to return an error
-                    errors.push({
-                      appId: appId,
-                      fieldId: key,
-                      preFormattedFieldValue: value,
-                      formattedFieldValue: fieldValue,
-                      detail: `Could not find field id ${key} in app ${appId}`
-                    });
+                  if (!fieldName) {
+                    // the field could not be found so we log it.  This can happen when a field in the app
+                    // is deleted but records legacy records still exist which contain the field
+                    this.log.debug(
+                      {
+                        appId: appId,
+                        fieldId: key,
+                        entityValue: entityValue
+                      },
+                      `Could not find field id ${key} in app ${appId}`
+                    );
+                    return;
                   }
 
-                  if (errors.length === 0) {
-                    results.push({
-                      appName: app.name,
-                      appAcronym: app.acronym,
-                      appId: appId,
-                      fieldId: key,
-                      fieldName: field.name,
-                      layoutPath: self._getLayoutPath(appId, key),
-                      fieldValue: fieldValue,
-                      recordTrackingId: record.trackingId,
-                      recordCreatedDate: record.createdDate,
-                      recordModifiedDate: record.modifiedDate,
-                      recordTotalTimeSpent: record.totalTimeSpent,
-                      recordId: record.id,
-                      recordUrl: self._createRecordUrl(options.url, appId, record.id)
-                    });
-                  }
+                  results.push({
+                    appName: app.name,
+                    appAcronym: app.acronym,
+                    appId: appId,
+                    fieldId: key,
+                    fieldName: fieldName,
+                    layoutPath: self._getLayoutPath(appId, key),
+                    fieldValue: fieldValue,
+                    recordTrackingId: record.trackingId,
+                    recordCreatedDate: record.createdDate,
+                    recordModifiedDate: record.modifiedDate,
+                    recordTotalTimeSpent: record.totalTimeSpent,
+                    recordId: record.id,
+                    recordUrl: self._createRecordUrl(options.url, appId, record.id)
+                  });
                 }
               });
             });
           }
         });
 
-        if (errors.length > 0) {
-          cb({ detail: 'Errors encountered when searching', errors: errors });
-        } else {
-          cb(null, results, resultsCount);
-        }
+        cb(null, results, resultsCount);
       })
     );
   }
@@ -171,6 +181,20 @@ class Swimlane {
 
     return false;
   }
+
+  _parseFieldValue(value, entityRegex) {
+    let fieldValue = value;
+    if (value.length > FIELD_VALUE_TRUNCATION_LENGTH) {
+      fieldValue = value.substring(0, FIELD_VALUE_TRUNCATION_LENGTH);
+    }
+    fieldValue = htmlEscape(fieldValue).replace(entityRegex, '<span class="match">$&</span>');
+
+    if (value.length > FIELD_VALUE_TRUNCATION_LENGTH) {
+      fieldValue += '<span class="truncated">... [content truncated]</span>';
+    }
+    return fieldValue;
+  }
+
   _cacheApps(options, cb) {
     let self = this;
 
@@ -261,26 +285,37 @@ class Swimlane {
       });
     }
   }
+
+  /**
+   * Returns the field for the provided fieldId within the given appId
+   * @param appId {String} The application id you want to lookup the field in
+   * @param fieldId {String} The id of the field you want to return
+   * @returns {*}
+   * @private
+   */
   _getField(appId, fieldId) {
     let app = this.appCache.get(appId);
-    if (app) {
+    if (app && app.has(fieldId)) {
       return app.get(fieldId);
     } else {
       return null;
     }
   }
+
+  /**
+   * Maps a field id for a given app to a field name
+   * @param appId  {String} The application id you want to lookup the field in
+   * @param fieldId {String} The field id you want to return the name for
+   * @returns {*}
+   * @private
+   */
   _getFieldName(appId, fieldId) {
     let app = this.appCache.get(appId);
-    if (app) {
-      if (!app.has(fieldId)) {
-        this.log.error(
-          { appId: appId, fieldId: fieldId },
-          '[_getFieldName] App does not contain fieldId'
-        );
-        return null;
-      } else {
-        return app.get(fieldId).fieldName;
-      }
+    // It is possible for a field to be deleted out of an app but to still have records that exist with that
+    // data in the backend.  As a result, we need to validate that we have a fieldId in the app cache.  If we don't
+    // we can safely ignore this field.
+    if (app && app.has(fieldId)) {
+      return app.get(fieldId).fieldName;
     } else {
       return null;
     }
