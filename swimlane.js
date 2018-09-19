@@ -86,7 +86,7 @@ class Swimlane {
       url: options.url + '/api/search',
       json: true,
       method: 'POST',
-      body: { applicationIds: appIds, keywords: entityValue, pageSize: 10 }
+      body: { applicationIds: appIds, keywords: `"${entityValue}"`, pageSize: 10 }
     };
 
     this.log.debug({ requestOptions: requestOptions }, 'HTTP Request Options');
