@@ -136,6 +136,15 @@ module.exports = {
             adminOnly: false
         },
         {
+            key: "filterFieldId",
+            name: "Filter Field Id",
+            description: "The field id to search.  Note that the ID form of the field is currently required.",
+            default: "",
+            type: "text",
+            userCanEdit: true,
+            adminOnly: false
+        },
+        {
             key: "numTags",
             name: "Number of Summary Tags",
             description: "The number of record IDs to show in the Polarity Overlay window summary",

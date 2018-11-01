@@ -2,7 +2,10 @@
     Displaying <span class="p-value">{{numRecords}}</span> of <span class="p-value">{{details.count}}</span> records
 </div>
 
-{{#each details.records as |record|}}
+{{#each details.records as |record index|}}
+    {{#if (gt index 0)}}
+        <hr>
+    {{/if}}
     <h1 class="p-title">
         {{fa-icon "ticket-alt"}}
         <a href="{{record.recordUrl}}" class="p-link" title="{{record.appName}} {{record.recordTrackingId}}">
@@ -16,9 +19,11 @@
             {{fa-icon "caret-right" class="p-grey layout-path-icon"}}
         {{/each}}
     </div>
+    {{!--
     <div>
         <pre>{{{record.fieldValue}}}</pre>
     </div>
+    --}}
     <div class="sub-info">
         <div>
             <span class="p-key">Created: </span>
@@ -33,5 +38,4 @@
             <span class="p-value">{{record.recordTotalTimeSpent}}</span>
         </div>
     </div>
-    <hr>
 {{/each}}
