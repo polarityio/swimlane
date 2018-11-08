@@ -11,28 +11,14 @@
         <a href="{{record.recordUrl}}" class="p-link" title="{{record.appName}} {{record.recordTrackingId}}">
             {{record.appAcronym}}-{{record.recordTrackingId}}
         </a>
-        <span class="title">{{record.fieldName}}</span>
     </h1>
-    <div class="path-container">
-        {{#each record.layoutPath as |path|}}
-            <span class="layout-path" title="{{path.layoutType}}">{{path.name}}</span>
-            {{fa-icon "caret-right" class="p-grey layout-path-icon"}}
-        {{/each}}
-    </div>
-    {{!--
-    <div>
-        <pre>{{{record.fieldValue}}}</pre>
-    </div>
-    --}}
     <div class="sub-info">
-        <div>
-            <span class="p-key">Created: </span>
-            <span class="p-value">{{moment-format record.recordCreatedDate 'MM/DD/YYYY' 'YYYY-MM-DDTHH:mm:ss'}}</span>
-        </div>
-        <div>
-            <span class="p-key">Last Modified: </span>
-            <span class="p-value">{{moment-format record.recordModifiedDate 'MM/DD/YYYY' 'YYYY-MM-DDTHH:mm:ss'}}</span>
-        </div>
+        {{#each record.detailFields  as | detailField | }}
+            <div>
+                <span class="p-key">{{detailField.name}}: </span>
+                <span class="p-value">{{detailField.value}}</span>
+            </div>
+        {{/each}}
         <div>
             <span class="p-key">Time Spent: </span>
             <span class="p-value">{{record.recordTotalTimeSpent}}</span>

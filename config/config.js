@@ -145,6 +145,15 @@ module.exports = {
             adminOnly: false
         },
         {
+            key: "detailFields",
+            name: "Detail Fields",
+            description: "A comma delimited list of field names to include in the details block of the result.",
+            default: "",
+            type: "text",
+            userCanEdit: true,
+            adminOnly: false
+        },
+        {
             key: "numTags",
             name: "Number of Summary Tags",
             description: "The number of record IDs to show in the Polarity Overlay window summary",
