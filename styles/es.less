@@ -1,0 +1,121 @@
+pre {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  max-height: 500px;
+  padding: 5px;
+  margin-top: 5px;
+  background-color: #fff;
+  font-family: 'Lucida Console', Monaco, monospace;
+}
+
+.external-icon{
+  font-size: 9px;
+}
+
+div.error-block{
+  margin-bottom: 10px;
+}
+
+span.highlight {
+  background-color: rgb(255, 255, 0);
+}
+
+div.title-block {
+  margin-bottom: 10px;
+}
+
+div.fields-table {
+  font-family: 'Lucida Console', Monaco, monospace;
+  font-size: 11px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  max-height: 500px;
+  table {
+    thead {
+      display: none;
+    }
+
+    tbody {
+      td {
+        border-bottom: 1px solid rgb(217, 217, 217);
+      }
+
+      tr:nth-child(odd) {
+        background-color: #fff;
+      }
+
+      tr:last-child {
+        td {
+          border-bottom: none;
+        }
+      }
+
+      td:first-child {
+        min-width: 35%;
+        width: 35%;
+      }
+    }
+  }
+}
+
+div.tab-container {
+  margin-top: 5px;
+}
+
+div.json-block {
+  .string {
+    color: #d14;
+  }
+  .number {
+    color: #008080;
+  }
+  .boolean {
+    color: #008080;
+  }
+  .null {
+    color: #008080;
+  }
+  .key {
+    color: #333;
+  }
+}
+
+div.scrollable-block {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  resize: vertical;
+  min-height: 100px;
+  max-height: 500px;
+}
+
+div.fields-block {
+  font-family: monospace;
+  word-break: break-all;
+  line-height: 2em;
+  font-size: 11px;
+  font-weight: 400;
+  margin-bottom: 20px;
+
+  span.field-key {
+    background-color: rgba(0, 46, 63, 0.1);
+    padding: 1px 5px;
+    word-break: normal;
+    border-radius: 2px;
+    color: #000;
+    display: inline;
+    margin-right: 5px;
+  }
+
+  span.field-value {
+    display: inline;
+    word-break: break-all;
+  }
+}
+
+.fields-table {
+  margin-bottom: 10px;
+}
+
+.highlight-entry {
+  margin-bottom: 10px;
+}
