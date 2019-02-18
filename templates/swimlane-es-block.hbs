@@ -1,0 +1,93 @@
+{{#if block.errorMsg}}
+    <div class="error-block p-red">
+        <div class="p-title p-red">{{fa-icon "exclamation-circle"}} Error Loading Details </div>
+        {{block.errorMsg}}
+    </div>
+{{/if}}
+
+<div>
+    Displaying <span class="p-value">{{numRecords}}</span> of <span class="p-value">{{details.totalResults}}</span> records
+</div>
+
+{{#each details.results as |item index|}}
+    {{#if (gt index 0)}}
+        <hr>
+    {{/if}}
+    <div class="p-title">
+        {{fa-icon "ticket-alt"}}
+        <a href="{{block.userOptions.url}}/record/{{item.hit._source.ApplicationId}}/{{item.hit._id}}" class="p-link" title="{{item.hit._source.TrackingFull}}">
+            {{item.hit._source.TrackingFull}}
+        </a>
+    </div>
+
+    <div class="sub-info">
+        {{#each details.detailFieldNames  as | fieldName | }}
+            {{#if (get item.hit._source.ValuesDocument fieldName)}}
+                <div>
+                    <span class="p-key">{{fieldName}}: </span>
+                    <span class="p-value">{{get item.hit._source.ValuesDocument fieldName}}</span>
+                </div>
+            {{/if}}
+        {{/each}}
+    </div>
+
+    {{#if block.isLoadingDetails}}
+        <span class="p-footnote">Loading Highlights ...</span>
+    {{else}}
+    <ul class="nav nav-tabs">
+        {{#if block.userOptions.highlightEnabled}}
+            <li class="nav-item">
+                <a {{action "showHighlights" index}} class="nav-link {{if item.showHighlights "active"}}" href="#">Highlights</a>
+            </li>
+        {{/if}}
+        <li class="nav-item">
+            <a {{action "showTable" index}} class="nav-link {{if item.showTable "active"}}" href="#">Table</a>
+        </li>
+        <li class="nav-item">
+            <a {{action "showJson" index}} class="nav-link {{if item.showJson "active"}}" href="#">JSON</a>
+        </li>
+        <li class="nav-item">
+            <a {{action "showSource" index}} class="nav-link {{if item.showSource "active"}}" href="#">_source</a>
+        </li>
+    </ul>
+    {{/if}}
+
+    {{#if item.showHighlights}}
+        <div class="tab-container">
+            {{#each (get details (concat "highlights." item.hit._id)) as |highlight|}}
+                <div class="fields-block">
+                    <div class="path-container">
+                        {{#each highlight.field.layoutPath as |path|}}
+                            <span class="layout-path" title="{{path.layoutType}}">{{path.name}}</span>
+                            {{fa-icon "caret-right" class="p-grey layout-path-icon"}}
+                        {{/each}}
+                    </div>
+                    {{#each highlight.fieldValues as |fieldValue|}}
+                        <span class="field-value">{{{fieldValue}}}</span>
+                    {{/each}}
+                </div>
+            {{/each}}
+        </div>
+    {{/if}}
+
+    {{#if item.showSource}}
+    <div class="tab-container fields-block scrollable-block">
+        {{#each-in item.sourceStringified as |key value|}}
+            <span class="field-key">{{key}}:</span><span class="field-value">{{value}}</span>
+        {{/each-in}}
+    </div>
+    {{/if}}
+
+    {{#if item.showTable}}
+    <div class="tab-container fields-table">
+        {{object-to-table item.hit._source.ValuesDocument}}
+    </div>
+    {{/if}}
+
+    {{#if item.showJson}}
+    <div class="tab-container json-block">
+        <pre>{{{item.json}}}</pre>
+    </div>
+    {{/if}}
+
+{{/each}}
