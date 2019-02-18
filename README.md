@@ -1,6 +1,6 @@
 # Polarity Swimlane Integration
 
-![image](https://img.shields.io/badge/status-beta-green.svg)
+![8b6eb0e4-946d-4970-8b8b-48d4eb6a7b32](https://user-images.githubusercontent.com/306319/52977525-87096c80-339b-11e9-89a1-fd0abbef0550.GIF)
 
 The Polarity Swimlane integration requires that you sync your Swimlane application data with an Elasticsearch cluster.
 Please contact us if you're interested in using Polarity to provide real-time data awareness into your Swimlane data.
