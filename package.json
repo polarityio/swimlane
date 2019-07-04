@@ -8,7 +8,8 @@
   "dependencies": {
     "async": "2.6.2",
     "request": "^2.88.0",
-    "lodash": "4.17.11"
+    "lodash": "4.17.11",
+    "snyk": "^1.190.0"
   },
   "devDependencies": {
     "bunyan": "^1.8.12",
@@ -19,6 +20,9 @@
   "scripts": {
     "pretest": "mb start --configfile imposters.json --mock &",
     "test": "mocha --recursive",
-    "posttest": "mb stop"
-  }
+    "posttest": "mb stop",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
