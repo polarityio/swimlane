@@ -6,9 +6,9 @@
   "license": "MIT",
   "author": "Polarity",
   "dependencies": {
-    "async": "2.6.2",
-    "request": "^2.88.0",
-    "lodash": "4.17.11"
+    "async": "^3.1",
+    "request": "^2.88",
+    "lodash": "^4.17"
   },
   "devDependencies": {
     "bunyan": "^1.8.12",
