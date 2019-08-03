@@ -69,14 +69,67 @@ class Swimlane {
     }
   }
 
+  /**
+   * There are three kinds of fields we have to handle.  The simplest if a key:value pair where the value is a string
+   *
+   * {
+   *  "a2eky2FeTAU52E5lN": "2018-12-06T17:20:45.615Z",
+   * }
+   *
+   * The second is where the value is an object (I believe this occurs when the field is actually a UI element).
+   * In this case we want to grab the `name` field and use that as our value.
+   *
+   * {
+   *  "a9OEYBJj_H_2OeHWI": {
+   *       "$type": "Core.Models.Utilities.UserGroupSelection, Core",
+   *       "id": "a52tKc7tUTuTO",
+   *       "name": "admin"
+   *   }
+   * }
+   *
+   * The final case is where the field in question is a multi-select field.  In this situation the field value will
+   * be an array.  We want to concatenate the values and make them comma delimited.
+   *
+   * {
+   *    "a24ih": [
+   *       {
+   *           "$type": "Core.Models.Record.ValueSelection, Core",
+   *           "id": "5d39043c9aae56ebec9aa12e",
+   *           "value": "Value 2"
+   *       },
+   *       {
+   *           "$type": "Core.Models.Record.ValueSelection, Core",
+   *           "id": "5d390446c11becb732872414",
+   *           "value": "Value 3"
+   *       }
+   *     ]
+   * }
+   * @param appId
+   * @param object
+   */
   toHumanReadable(appId, object) {
     let newObject = {};
     for (let key in object) {
       let fieldName = this._getFieldName(appId, key);
-      if (fieldName) {
-        newObject[fieldName] = object[key];
+      let fieldValue = object[key];
+      let fieldValueAsString = '';
+
+      if (Array.isArray(fieldValue)) {
+        fieldValueAsString = fieldValue
+          .map((field) => {
+            return field.value;
+          })
+          .join(', ');
+      } else if (typeof fieldValue === 'object' && fieldValue !== null) {
+        fieldValueAsString = fieldValue.name;
       } else {
-        newObject[key] = object[key];
+        fieldValueAsString = fieldValue;
+      }
+
+      if (fieldName) {
+        newObject[fieldName] = fieldValueAsString;
+      } else {
+        newObject[key] = fieldValueAsString;
       }
     }
 
