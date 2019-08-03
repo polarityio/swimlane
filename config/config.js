@@ -23,7 +23,7 @@ module.exports = {
    * @optional
    */
   description: 'Swimlane is a security automation, orchestration and incident response platform',
-  entityTypes: ['ip', 'email'],
+  entityTypes: ['ip', 'email', 'hash'],
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
    * the below files can be used in your custom template.
