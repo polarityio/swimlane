@@ -4,7 +4,7 @@
 
 {{#each details.records as |record|}}
     <h1 class="p-title">
-        {{fa-icon "ticket-alt"}}
+        {{fa-icon icon="ticket-alt" fixedWidth=true}}
         <a href="{{record.recordUrl}}" class="p-link" title="{{record.appName}} {{record.recordTrackingId}}">
             {{record.appAcronym}}-{{record.recordTrackingId}}
         </a>
@@ -33,5 +33,4 @@
             <span class="p-value">{{record.recordTotalTimeSpent}}</span>
         </div>
     </div>
-    <hr>
 {{/each}}

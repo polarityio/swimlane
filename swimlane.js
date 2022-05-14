@@ -83,10 +83,10 @@ class Swimlane {
     }
 
     const requestOptions = {
-      url: options.url + '/api/search',
+      url: options.url + '/api/search/keyword',
       json: true,
       method: 'POST',
-      body: { applicationIds: appIds, keywords: `"${entityValue}"`, pageSize: 10 }
+      body: { applicationIds: appIds, keywords: `${entityValue}`, pageSize: 10 }
     };
 
     this.log.debug({ requestOptions: requestOptions }, 'HTTP Request Options');
@@ -95,69 +95,72 @@ class Swimlane {
       options,
       requestOptions,
       self._handleRequestError('Searching SwimLane', cb, (response, body) => {
+        this.log.info({body}, 'Search Response');
         const entityRegEx = new RegExp(entityValue, 'gi');
-        const resultsCount = body.count;
+        const resultsCount = body.records.length;
 
-        appIds.forEach((appId) => {
-          if (Array.isArray(body.results[appId])) {
-            body.results[appId].forEach((record) => {
-              let keys = Object.keys(record.values);
-              keys.forEach((key) => {
-                let value = record.values[key];
-                if (
-                  typeof value === 'string' &&
-                  value.toLowerCase().includes(entityValue.toLowerCase())
-                ) {
-                  const fieldValue = this._parseFieldValue(value, entityRegEx);
-                  const app = self._getApp(appId);
-                  const fieldName = self._getFieldName(appId, key);
+        body.records.forEach(record => {
+          const appId = record.applicationId;
+          const keys = Object.keys(record.values);
 
-                  if (!app) {
-                    // the appId could not be found so we log it
-                    this.log.debug(
-                      {
-                        appId: appId,
-                        fieldId: key,
-                        entityValue: entityValue
-                      },
-                      `Could not find the app ${appId}`
-                    );
-                    return;
-                  }
+          keys.forEach((key) => {
+            let value = record.values[key];
+            if (
+                typeof value === 'string' &&
+                value.toLowerCase().includes(entityValue.toLowerCase())
+            ) {
+              const fieldValue = this._parseFieldValue(value, entityRegEx);
+              const app = self._getApp(appId);
+              const fieldName = self._getFieldName(appId, key);
 
-                  if (!fieldName) {
-                    // the field could not be found so we log it.  This can happen when a field in the app
-                    // is deleted but records legacy records still exist which contain the field
-                    this.log.debug(
-                      {
-                        appId: appId,
-                        fieldId: key,
-                        entityValue: entityValue
-                      },
-                      `Could not find field id ${key} in app ${appId}`
-                    );
-                    return;
-                  }
+              if (!app) {
+                // the appId could not be found so we log it
+                this.log.debug(
+                    {
+                      appId: appId,
+                      fieldId: key,
+                      entityValue: entityValue
+                    },
+                    `Could not find the app ${appId}`
+                );
+                return;
+              }
 
-                  results.push({
-                    appName: app.name,
-                    appAcronym: app.acronym,
-                    appId: appId,
-                    fieldId: key,
-                    fieldName: fieldName,
-                    layoutPath: self._getLayoutPath(appId, key),
-                    fieldValue: fieldValue,
-                    recordTrackingId: record.trackingId,
-                    recordCreatedDate: record.createdDate,
-                    recordModifiedDate: record.modifiedDate,
-                    recordTotalTimeSpent: record.totalTimeSpent,
-                    recordId: record.id,
-                    recordUrl: self._createRecordUrl(options.url, appId, record.id)
-                  });
-                }
+
+              if (!fieldName) {
+                // the field could not be found so we log it.  This can happen when a field in the app
+                // is deleted but records legacy records still exist which contain the field
+                // TODO: This can also happen if the app has been updated and the record match comes
+                // from a new field.  In this case, we need to reload our app by restarting the
+                // integration.
+                this.log.debug(
+                    {
+                      appId: appId,
+                      fieldId: key,
+                      entityValue: entityValue
+                    },
+                    `Could not find field id ${key} in app ${appId}`
+                );
+                return;
+              }
+
+              results.push({
+                appName: app.name,
+                appAcronym: app.acronym,
+                appId: appId,
+                fieldId: key,
+                fieldName: fieldName,
+                layoutPath: self._getLayoutPath(appId, key),
+                fieldValue: fieldValue,
+                recordTrackingId: record.trackingId,
+                recordCreatedDate: record.createdDate,
+                recordModifiedDate: record.modifiedDate,
+                recordTotalTimeSpent: record.totalTimeSpent,
+                recordId: record.id,
+                recordUrl: self._createRecordUrl(options.url, appId, record.id)
               });
-            });
-          }
+            }
+          });
         });
 
         cb(null, results, resultsCount);
@@ -457,6 +460,8 @@ class Swimlane {
         password: options.password
       }
     };
+
+    this.log.info(requestOptions);
 
     this.request(requestOptions, (err, response, body) => {
       if (err || response.statusCode != 200 || !body || !body.token) {

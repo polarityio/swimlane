@@ -1,4 +1,4 @@
-const request = require('request');
+const request = require('postman-request');
 const async = require('async');
 const config = require('./config/config');
 const Swimlane = require('./swimlane');
@@ -8,7 +8,7 @@ let swimlane;
 let Logger;
 
 function doLookup(entities, options, cb) {
-  let results = [];
+  let lookupResults = [];
 
   swimlane.cacheApps(options, (err) => {
     if (err) {
@@ -24,7 +24,7 @@ function doLookup(entities, options, cb) {
           }
 
           if (records.length > 0) {
-            results.push({
+            lookupResults.push({
               entity: entity,
               data: {
                 summary: _getTags(records),
@@ -35,7 +35,7 @@ function doLookup(entities, options, cb) {
               }
             });
           } else {
-            results.push({
+            lookupResults.push({
               entity: entity,
               data: null
             });
@@ -45,8 +45,8 @@ function doLookup(entities, options, cb) {
         });
       },
       (err) => {
-        Logger.trace({results:results}, 'Final Results');
-        cb(err, results);
+        Logger.trace({ lookupResults }, 'Final Results');
+        cb(err, lookupResults);
       }
     );
   });
