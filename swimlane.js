@@ -31,6 +31,8 @@ class Swimlane {
             { cachedApps: Array.from(this.appNameToId.keys()) },
             'Successfully Cached Apps'
           );
+        } else {
+          this.log.error(err);
         }
         self.cachingAppFailed = err ? true : false;
         self.isCaching = false;
@@ -72,8 +74,7 @@ class Swimlane {
         return cb({
           detail: 'The Application [' + appNames[i].trim() + '] could not be found',
           availableApps: Array.from(this.appNameToId.keys()),
-          note:
-            'The app names are case insensitive so you do not need to match the casing provided in `availableApps`'
+          note: 'The app names are case insensitive so you do not need to match the casing provided in `availableApps`'
         });
       }
     }
@@ -86,7 +87,15 @@ class Swimlane {
       url: options.url + '/api/search/keyword',
       json: true,
       method: 'POST',
-      body: { applicationIds: appIds, keywords: `${entityValue}`, pageSize: 10 }
+      body: {
+        applicationIds: appIds,
+        keywords: `${entityValue}`,
+        countByApplicationFacet: true
+      },
+      qs: {
+        page: 1,
+        size: options.maxResults
+      }
     };
 
     this.log.debug({ requestOptions: requestOptions }, 'HTTP Request Options');
@@ -95,19 +104,18 @@ class Swimlane {
       options,
       requestOptions,
       self._handleRequestError('Searching SwimLane', cb, (response, body) => {
-        this.log.info({body}, 'Search Response');
+        this.log.trace({ body }, 'Search Response');
         const entityRegEx = new RegExp(entityValue, 'gi');
-        const resultsCount = body.records.length;
 
-        body.records.forEach(record => {
+        body.records.forEach((record) => {
           const appId = record.applicationId;
           const keys = Object.keys(record.values);
 
           keys.forEach((key) => {
             let value = record.values[key];
             if (
-                typeof value === 'string' &&
-                value.toLowerCase().includes(entityValue.toLowerCase())
+              typeof value === 'string' &&
+              value.toLowerCase().includes(entityValue.toLowerCase())
             ) {
               const fieldValue = this._parseFieldValue(value, entityRegEx);
               const app = self._getApp(appId);
@@ -116,16 +124,15 @@ class Swimlane {
               if (!app) {
                 // the appId could not be found so we log it
                 this.log.debug(
-                    {
-                      appId: appId,
-                      fieldId: key,
-                      entityValue: entityValue
-                    },
-                    `Could not find the app ${appId}`
+                  {
+                    appId: appId,
+                    fieldId: key,
+                    entityValue: entityValue
+                  },
+                  `Could not find the app ${appId}`
                 );
                 return;
               }
-
 
               if (!fieldName) {
                 // the field could not be found so we log it.  This can happen when a field in the app
@@ -134,12 +141,12 @@ class Swimlane {
                 // from a new field.  In this case, we need to reload our app by restarting the
                 // integration.
                 this.log.debug(
-                    {
-                      appId: appId,
-                      fieldId: key,
-                      entityValue: entityValue
-                    },
-                    `Could not find field id ${key} in app ${appId}`
+                  {
+                    appId: appId,
+                    fieldId: key,
+                    entityValue: entityValue
+                  },
+                  `Could not find field id ${key} in app ${appId}`
                 );
                 return;
               }
@@ -156,6 +163,9 @@ class Swimlane {
                 recordCreatedDate: record.createdDate,
                 recordModifiedDate: record.modifiedDate,
                 recordTotalTimeSpent: record.totalTimeSpent,
+                timeTrackingEnabled: record.timeTrackingEnabled,
+                modifiedByUser: record.modifiedByUser.name,
+                createdByUser: record.createdByUser.name,
                 recordId: record.id,
                 recordUrl: self._createRecordUrl(options.url, appId, record.id)
               });
@@ -163,7 +173,7 @@ class Swimlane {
           });
         });
 
-        cb(null, results, resultsCount);
+        cb(null, results);
       })
     );
   }
@@ -225,11 +235,13 @@ class Swimlane {
       })
     );
   }
+
   _buildLayoutPath(appId, layout) {
     layout.forEach((item) => {
       this._parseLayoutItem(appId, item, []);
     });
   }
+
   _parseLayoutItem(appId, item, path) {
     if (item['$type'] === 'Core.Models.Layouts.SectionLayout, Core') {
       this._parseSectionLayout(appId, item, path);
@@ -241,6 +253,7 @@ class Swimlane {
       this._parseTab(appId, item, path);
     }
   }
+
   _parseFieldsLayout(appId, field, path) {
     if (field.fieldId) {
       path.push({
@@ -252,6 +265,7 @@ class Swimlane {
       this._setLayoutPath(appId, field.fieldId, path);
     }
   }
+
   _parseSectionLayout(appId, section, path) {
     if (Array.isArray(section.children)) {
       path.push({
@@ -266,6 +280,7 @@ class Swimlane {
       });
     }
   }
+
   _parseTabLayout(appId, tabLayout, path) {
     if (Array.isArray(tabLayout.tabs)) {
       tabLayout.tabs.forEach((item) => {
@@ -274,6 +289,7 @@ class Swimlane {
       });
     }
   }
+
   _parseTab(appId, tab, path) {
     if (Array.isArray(tab.children)) {
       path.push({
@@ -323,6 +339,7 @@ class Swimlane {
       return null;
     }
   }
+
   _getLayoutPath(appId, fieldId) {
     let app = this.appCache.get(appId);
     if (app) {
@@ -331,6 +348,7 @@ class Swimlane {
       return null;
     }
   }
+
   _setFieldName(appId, fieldId, fieldName) {
     if (!this.appCache.has(appId)) {
       this.appCache.set(appId, new Map());
@@ -344,6 +362,7 @@ class Swimlane {
 
     app.set(fieldId, _.merge(field, { fieldName: fieldName }));
   }
+
   _setLayoutPath(appId, fieldId, layoutPath) {
     if (!this.appCache.has(appId)) {
       this.appCache.set(appId, new Map());
@@ -358,6 +377,7 @@ class Swimlane {
 
     app.set(fieldId, _.merge(field, { layoutPath: layoutPath }));
   }
+
   _createRecordUrl(host, appId, recordId) {
     return host + '/record/' + appId + '/' + recordId;
   }
@@ -402,7 +422,7 @@ class Swimlane {
 
   _handleRequestError(errorMessage, errorCb, cb) {
     let self = this;
-    return function(err, response, body) {
+    return function (err, response, body) {
       if (err) {
         self.log.error({
           err: err,
@@ -412,7 +432,7 @@ class Swimlane {
 
         errorCb({
           err: err,
-          detail: 'HTTP Error: ' + errorMessage,
+          detail: err && err.detail ? err.detail : 'HTTP Error: ' + errorMessage,
           body: body
         });
 
@@ -428,7 +448,7 @@ class Swimlane {
 
         errorCb({
           err: err,
-          detail: 'Error: ' + errorMessage,
+          detail: err && err.detail ? err.detail : 'HTTP Error: ' + errorMessage,
           body: body
         });
 
@@ -461,16 +481,20 @@ class Swimlane {
       }
     };
 
-    this.log.info(requestOptions);
-
     this.request(requestOptions, (err, response, body) => {
       if (err || response.statusCode != 200 || !body || !body.token) {
+        let detail = 'Error generating access token';
+        if (err) {
+          detail = err.message ? err.message : err.code;
+        } else if (response.statusCode === 401) {
+          detail = 'Authentication error: Validate your username and password.';
+        }
+
         cb({
           err: err,
           response: response,
-          username: options.username,
           body: body,
-          detail: 'Error retrieving Swimlane API token'
+          detail
         });
         return;
       }
@@ -484,10 +508,7 @@ class Swimlane {
 
   _getAccessTokenCacheKey(options) {
     let key = options.url + options.username + options.password;
-    return crypto
-      .createHash('sha1')
-      .update(key)
-      .digest('hex');
+    return crypto.createHash('sha1').update(key).digest('hex');
   }
 }
 

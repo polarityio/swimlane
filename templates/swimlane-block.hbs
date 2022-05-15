@@ -1,20 +1,19 @@
-<div>
-    Displaying <span class="p-value">{{numRecords}}</span> of <span class="p-value">{{details.count}}</span> records
-</div>
-
 {{#each details.records as |record|}}
     <h1 class="p-title">
         {{fa-icon icon="ticket-alt" fixedWidth=true}}
         <a href="{{record.recordUrl}}" class="p-link" title="{{record.appName}} {{record.recordTrackingId}}">
-            {{record.appAcronym}}-{{record.recordTrackingId}}
+          {{record.appName}}: {{record.appAcronym}}-{{record.recordTrackingId}} {{fa-icon icon="external-link-square" fixedWidth=true class="external-link"}}
         </a>
-        <span class="title">{{record.fieldName}}</span>
     </h1>
     <div class="path-container">
+      <div class="breadcrumb-mask"></div>
+      <ul>
         {{#each record.layoutPath as |path|}}
+          <li>
             <span class="layout-path" title="{{path.layoutType}}">{{path.name}}</span>
-            {{fa-icon "caret-right" class="p-grey layout-path-icon"}}
+          </li>
         {{/each}}
+      </ul>
     </div>
     <div>
         <pre>{{{record.fieldValue}}}</pre>
@@ -24,13 +23,23 @@
             <span class="p-key">Created: </span>
             <span class="p-value">{{moment-format record.recordCreatedDate 'MM/DD/YYYY' 'YYYY-MM-DDTHH:mm:ss'}}</span>
         </div>
+      <div>
+        <span class="p-key">Created By: </span>
+        <span class="p-value">{{record.createdByUser}}</span>
+      </div>
         <div>
             <span class="p-key">Last Modified: </span>
             <span class="p-value">{{moment-format record.recordModifiedDate 'MM/DD/YYYY' 'YYYY-MM-DDTHH:mm:ss'}}</span>
         </div>
         <div>
-            <span class="p-key">Time Spent: </span>
-            <span class="p-value">{{record.recordTotalTimeSpent}}</span>
+          <span class="p-key">Last Modified By: </span>
+          <span class="p-value">{{record.modifiedByUser}}</span>
         </div>
+        {{#if (and record.timeTrackingEnabled record.recordTotalTimeSpent)}}
+          <div>
+              <span class="p-key">Time Spent: </span>
+              <span class="p-value">{{record.recordTotalTimeSpent}}</span>
+          </div>
+        {{/if}}
     </div>
 {{/each}}

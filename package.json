@@ -1,7 +1,7 @@
 {
   "main": "./integration.js",
   "name": "swimlane",
-  "version": "3.1.0-beta1",
+  "version": "3.4.0",
   "private": true,
   "license": "MIT",
   "author": "Polarity",

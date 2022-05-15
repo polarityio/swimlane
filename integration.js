@@ -18,7 +18,7 @@ function doLookup(entities, options, cb) {
     async.each(
       entities,
       (entity, next) => {
-        swimlane.search(entity.value, options, (err, records, resultsCount) => {
+        swimlane.search(entity.value, options, (err, records) => {
           if (err) {
             return next(err);
           }
@@ -27,10 +27,9 @@ function doLookup(entities, options, cb) {
             lookupResults.push({
               entity: entity,
               data: {
-                summary: _getTags(records),
+                summary: _getTags(records, options),
                 details: {
-                  records: records,
-                  count: resultsCount
+                  records: records
                 }
               }
             });
@@ -52,12 +51,17 @@ function doLookup(entities, options, cb) {
   });
 }
 
-function _getTags(records) {
+function _getTags(records, options) {
   let tags = new Set();
   records.forEach((record) => {
     tags.add(record.appAcronym + '-' + record.recordTrackingId);
   });
-  return [...tags];
+  const tagsArray = [...tags];
+  const slicedTagsArray = tagsArray.slice(0, options.numTags);
+  if (slicedTagsArray.length < tagsArray.length) {
+    slicedTagsArray.push(`+${tagsArray.length - slicedTagsArray.length} more`);
+  }
+  return slicedTagsArray;
 }
 
 function startup(logger) {
