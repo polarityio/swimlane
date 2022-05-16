@@ -28,6 +28,24 @@ The maximum number of results that will be returned to the overlay window. Defau
 
 The number of record IDs to show in the Polarity Overlay window summary. Defaults to 5. This option should be set to "Only admins can view and edit".
 
+## Troubleshooting
+
+### Error: Cannot run searches due to a failure to load the Swimlane application 
+
+On the first search of the integration, the integration will attempt to cache Swimlane application data.  You will see the following error if the integration was unable to cache the Swimlane applications:
+
+```
+Cannot run searches due to a failure to load the Swimlane application
+```
+
+This error can occur if an invalid username/password was used on the first search.  You can force the integration to attempt to re-cache the Swimlane applications by restarting the integration.
+
+### Making changes to applications in Swimlane
+
+If an application is changed or added within Swimlane, the integration will need to be restarted to load these changes.
+
+
+
 ## Installation Instructions
 
 Installation instructions for integrations are provided on the [PolarityIO GitHub Page](https://polarityio.github.io/).
