@@ -90,7 +90,10 @@ class Swimlane {
       body: {
         applicationIds: appIds,
         keywords: `${entityValue}`,
-        countByApplicationFacet: true
+        countByApplicationFacet: true,
+        sorts: {
+          modifiedDate: 'Descending'
+        }
       },
       qs: {
         page: 1,
