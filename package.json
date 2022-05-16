@@ -9,16 +9,5 @@
     "async": "^3.2.3",
     "postman-request": "^2.88.1-postman.31",
     "lodash": "^4.17.21"
-  },
-  "devDependencies": {
-    "bunyan": "^1.8.15",
-    "chai": "^4.3.6",
-    "mocha": "^10.0.0",
-    "mountebank": "^2.6.0"
-  },
-  "scripts": {
-    "pretest": "mb start --configfile imposters.json --mock &",
-    "test": "mocha --recursive",
-    "posttest": "mb stop"
   }
 }
