@@ -96,8 +96,8 @@ module.exports = {
       description: 'URL of the Swimlane instance to use including the schema (i.e., https://). This option should be set to "Only admins can view and edit".',
       default: '',
       type: 'text',
-      userCanEdit: true,
-      adminOnly: false
+      userCanEdit: false,
+      adminOnly: true
     },
     {
       key: 'username',
@@ -114,8 +114,8 @@ module.exports = {
       description: "The password for the provided user.",
       default: '',
       type: 'password',
-      userCanEdit: false,
-      adminOnly: true
+      userCanEdit: true,
+      adminOnly: false
     },
     {
       key: 'applications',
