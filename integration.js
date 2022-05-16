@@ -97,7 +97,46 @@ function startup(logger) {
   swimlane = new Swimlane(requestWithDefaults, logger);
 }
 
+function validateOptions(userOptions, cb) {
+  let errors = [];
+
+  if (typeof userOptions.url.value !== 'string' ||
+      (typeof userOptions.url.value === 'string' && userOptions.url.value.length === 0)) {
+    errors.push({
+      key: 'url',
+      message: 'You must provide a Swimlane URL'
+    })
+  }
+
+  if (typeof userOptions.username.value !== 'string' ||
+      (typeof userOptions.username.value === 'string' && userOptions.username.value.length === 0)) {
+    errors.push({
+      key: 'username',
+      message: 'You must provide a username'
+    })
+  }
+
+  if (typeof userOptions.password.value !== 'string' ||
+      (typeof userOptions.password.value === 'string' && userOptions.password.value.length === 0)) {
+    errors.push({
+      key: 'password',
+      message: 'You must provide a password'
+    })
+  }
+
+  if (typeof userOptions.applications.value !== 'string' ||
+      (typeof userOptions.applications.value === 'string' && userOptions.applications.value.length === 0)) {
+    errors.push({
+      key: 'applications',
+      message: 'You must provide a comma delimited list of Applications to search'
+    })
+  }
+
+  cb(null, errors);
+}
+
 module.exports = {
-  doLookup: doLookup,
-  startup: startup
+  doLookup,
+  startup,
+  validateOptions
 };
