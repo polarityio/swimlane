@@ -111,7 +111,7 @@ module.exports = {
     {
       key: 'password',
       name: 'Password',
-      description: "The password for the provided user",
+      description: "The password for the provided user.",
       default: '',
       type: 'password',
       userCanEdit: false,
