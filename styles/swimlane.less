@@ -1,9 +1,126 @@
+@breadcrumb-color: #ddd;
+
 pre {
   overflow-y: scroll;
   overflow-x: hidden;
   padding: 5px;
   resize: vertical;
-  height: 100px;
+  max-height: 150px;
+  border: 1px solid #ccc;
+  word-break: break-word;
+  white-space: pre-wrap;
+  margin-bottom: 0px;
+}
+
+.external-link {
+  font-size: 9px;
+  margin-bottom: 1px;
+}
+
+div.path-container {
+  margin-bottom: 0px;
+  position: relative;
+
+  .breadcrumb-mask {
+    position: absolute;
+    left: -5px;
+    height: 100%;
+    background-color: #fff;
+    z-index: 10;
+    width: 5px;
+  }
+
+  ul {
+    list-style: none;
+    display: inline-block;
+    padding-inline-start: 0px;
+    margin-bottom: 5px;
+    font-size: 11px;
+    margin-top: 0px;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+
+    li {
+      float: left;
+      margin-bottom: 5px;
+
+      span {
+        color: #000;
+        display: block;
+        background: #ddd;
+        text-decoration: none;
+        position: relative;
+        height: 14px;
+        line-height: 13px;
+        padding: 0 5px 0 5px;
+        text-align: center;
+        margin-right: 8px;
+      }
+
+      &:nth-child(even) {
+        span {
+          background-color: @breadcrumb-color;
+
+          &:before {
+            border-color: @breadcrumb-color;
+            border-left-color: transparent;
+          }
+
+          &:after {
+            border-left-color: @breadcrumb-color;
+          }
+        }
+      }
+
+      &:first-child {
+        span {
+          padding-left: 4px;
+          border-radius: 2px 0 0 2px;
+
+          &:before {
+            border: none;
+          }
+        }
+      }
+
+      &:last-child {
+        span {
+          padding-right: 5px;
+          border-radius: 2px 2px 2px 2px;
+
+          &:after {
+            border: none;
+          }
+        }
+      }
+
+      span {
+        &:before,
+        &:after {
+          content: "";
+          position: absolute;
+          top: 0;
+          border: 0 solid @breadcrumb-color;
+          border-width: 7px 5px;
+          width: 0;
+          height: 0;
+        }
+
+        &:before {
+          left: -5px;
+          border-left-color: transparent;
+        }
+
+        &:after {
+          left: 100%;
+          border-color: transparent;
+          border-left-color: @breadcrumb-color;
+        }
+      }
+    }
+  }
 }
 
 span.title {
@@ -12,22 +129,6 @@ span.title {
 
 span.truncated {
   font-style: italic;
-}
-
-span.layout-path {
-  background-color: #eee;
-  border-radius: 4px;
-  padding: 0px 3px;
-  margin-bottom: 5px;
-  display: inline-block;
-}
-
-.layout-path-icon:last-child {
-  display: none;
-}
-
-div.path-container {
-  margin-bottom: 0px;
 }
 
 span.match {
