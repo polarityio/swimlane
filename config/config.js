@@ -121,7 +121,7 @@ module.exports = {
       key: 'applications',
       name: 'Applications',
       description:
-        'A comma-delimited, case-insensitive list of applications you would like to search.  This option should be set to "Only admins can view and edit".',
+        'A comma-delimited, case-insensitive list of application names you would like to search. Provide the application name and not the application id. This option should be set to "Only admins can view and edit".',
       default: '',
       type: 'text',
       userCanEdit: false,

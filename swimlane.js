@@ -109,8 +109,18 @@ class Swimlane {
       self._handleRequestError('Searching SwimLane', cb, (response, body) => {
         this.log.trace({ body }, 'Search Response');
         const entityRegEx = new RegExp(entityValue, 'gi');
-
-        body.records.forEach((record) => {
+        let records;
+        if(Array.isArray(body.records)){
+          records = body.records;
+        } else if(body.results && Array.isArray(body.results.items)){
+          records = body.results.items;
+        } else {
+          //unexpected response format
+          return cb({
+            detail: 'Unexpected response payload format.  Missing top level `records` or `results.items` keys.'
+          });
+        }
+        records.forEach((record) => {
           const appId = record.applicationId;
           const keys = Object.keys(record.values);
 
