@@ -1,0 +1,92 @@
+{
+  "name": "Swimlane",
+  "acronym": "SWM",
+  "defaultColor": "light-blue",
+  "onDemandOnly": true,
+  "description": "Search application records in Swimlane, a security automation, orchestration and incident response platform",
+  "entityTypes": [
+    "email",
+    "domain",
+    "hash",
+    "url",
+    "cve"
+  ],
+  "styles": [
+    "./styles/swimlane.less"
+  ],
+  "block": {
+    "component": {
+      "file": "./components/swimlane-block.js"
+    },
+    "template": {
+      "file": "./templates/swimlane-block.hbs"
+    }
+  },
+  "request": {
+    "cert": "",
+    "key": "",
+    "passphrase": "",
+    "ca": "",
+    "proxy": "",
+    "rejectUnauthorized": true
+  },
+  "logging": {
+    "level": "info"
+  },
+  "options": [
+    {
+      "key": "url",
+      "name": "URL",
+      "description": "URL of the Swimlane instance to use including the schema (i.e., https://). This option should be set to \"Only admins can view and edit\".",
+      "default": "",
+      "type": "text",
+      "userCanEdit": false,
+      "adminOnly": true
+    },
+    {
+      "key": "username",
+      "name": "Username",
+      "description": "The username for the account you wish to authenticate as.",
+      "default": "",
+      "type": "text",
+      "userCanEdit": true,
+      "adminOnly": false
+    },
+    {
+      "key": "password",
+      "name": "Password",
+      "description": "The password for the provided user.",
+      "default": "",
+      "type": "password",
+      "userCanEdit": true,
+      "adminOnly": false
+    },
+    {
+      "key": "applications",
+      "name": "Applications",
+      "description": "A comma-delimited, case-insensitive list of application names you would like to search. Provide the application name and not the application id. This option should be set to \"Only admins can view and edit\".",
+      "default": "",
+      "type": "text",
+      "userCanEdit": false,
+      "adminOnly": true
+    },
+    {
+      "key": "maxResults",
+      "name": "Maximum number of results to return",
+      "description": "The maximum number of results that will be returned to the overlay window.  Defaults to 10. This option should be set to \"Only admins can view and edit\".",
+      "default": 10,
+      "type": "number",
+      "userCanEdit": false,
+      "adminOnly": true
+    },
+    {
+      "key": "numTags",
+      "name": "Number of Summary Tags to Display",
+      "description": "The number of record IDs to show in the Polarity Overlay window summary. Defaults to 5. This option should be set to \"Only admins can view and edit\".",
+      "default": 5,
+      "type": "number",
+      "userCanEdit": false,
+      "adminOnly": true
+    }
+  ]
+}
