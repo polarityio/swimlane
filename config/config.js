@@ -16,6 +16,7 @@ module.exports = {
    * @required
    */
   acronym: 'SWM',
+  defaultColor: 'light-blue',
   onDemandOnly: true,
   /**
    * Description for this integration which is displayed in the Polarity integrations user interface
@@ -23,7 +24,8 @@ module.exports = {
    * @type String
    * @optional
    */
-  description: 'Search application records in Swimlane, a security automation, orchestration and incident response platform',
+  description:
+    'Search application records in Swimlane, a security automation, orchestration and incident response platform',
   entityTypes: ['ip', 'email', 'domain', 'hash', 'url', 'cve'],
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
@@ -93,7 +95,8 @@ module.exports = {
     {
       key: 'url',
       name: 'URL',
-      description: 'URL of the Swimlane instance to use including the schema (i.e., https://). This option should be set to "Only admins can view and edit".',
+      description:
+        'URL of the Swimlane instance to use including the schema (i.e., https://). This option should be set to "Only admins can view and edit".',
       default: '',
       type: 'text',
       userCanEdit: false,
@@ -102,7 +105,7 @@ module.exports = {
     {
       key: 'username',
       name: 'Username',
-      description: "The username for the account you wish to authenticate as.",
+      description: 'The username for the account you wish to authenticate as.',
       default: '',
       type: 'text',
       userCanEdit: true,
@@ -111,7 +114,7 @@ module.exports = {
     {
       key: 'password',
       name: 'Password',
-      description: "The password for the provided user.",
+      description: 'The password for the provided user.',
       default: '',
       type: 'password',
       userCanEdit: true,
@@ -140,7 +143,8 @@ module.exports = {
     {
       key: 'numTags',
       name: 'Number of Summary Tags to Display',
-      description: 'The number of record IDs to show in the Polarity Overlay window summary. Defaults to 5. This option should be set to "Only admins can view and edit".',
+      description:
+        'The number of record IDs to show in the Polarity Overlay window summary. Defaults to 5. This option should be set to "Only admins can view and edit".',
       default: 5,
       type: 'number',
       userCanEdit: false,

@@ -1,6 +1,7 @@
 {
   "name": "Swimlane",
   "acronym": "SWM",
+  "defaultColor": "light-blue",
   "onDemandOnly": true,
   "description": "Search application records in Swimlane, a security automation, orchestration and incident response platform",
   "entityTypes": [
