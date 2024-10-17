@@ -6,8 +6,8 @@
   "license": "MIT",
   "author": "Polarity",
   "dependencies": {
-    "async": "^3.2.3",
-    "postman-request": "^2.88.1-postman.33",
+    "async": "^3.2.5",
+    "postman-request": "^2.88.1-postman.40",
     "lodash": "^4.17.21"
   }
 }

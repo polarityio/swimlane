@@ -26,7 +26,7 @@ module.exports = {
    */
   description:
     'Search application records in Swimlane, a security automation, orchestration and incident response platform',
-  entityTypes: ['IP', 'email', 'domain', 'hash', 'url', 'cve'],
+  entityTypes: ['email', 'domain', 'MD5', 'SHA1', 'SHA256', 'url', 'cve'],
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
    * the below files can be used in your custom template.
@@ -66,7 +66,7 @@ module.exports = {
     ca: '',
     // An HTTP proxy to be used. Supports proxy Auth with Basic Auth, identical to support for
     // the url parameter (by embedding the auth info in the uri)
-    proxy: ""
+    proxy: ''
   },
   logging: {
     // directory is relative to the this integrations directory
