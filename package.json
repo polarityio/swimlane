@@ -1,13 +1,13 @@
 {
   "name": "swimlane",
-  "version": "3.4.4",
+  "version": "3.4.5",
   "main": "./integration.js",
   "private": true,
   "license": "MIT",
   "author": "Polarity",
   "dependencies": {
-    "async": "^3.2.3",
-    "postman-request": "^2.88.1-postman.31",
+    "async": "^3.2.5",
+    "postman-request": "^2.88.1-postman.40",
     "lodash": "^4.17.21"
   }
 }

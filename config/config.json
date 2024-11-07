@@ -5,16 +5,8 @@
   "defaultColor": "light-blue",
   "onDemandOnly": true,
   "description": "Search application records in Swimlane, a security automation, orchestration and incident response platform",
-  "entityTypes": [
-    "email",
-    "domain",
-    "hash",
-    "url",
-    "cve"
-  ],
-  "styles": [
-    "./styles/swimlane.less"
-  ],
+  "entityTypes": ["IPv4", "IPv6","email", "domain", "MD5", "SHA1", "SHA256", "url", "cve"],
+  "styles": ["./styles/swimlane.less"],
   "block": {
     "component": {
       "file": "./components/swimlane-block.js"
@@ -22,13 +14,6 @@
     "template": {
       "file": "./templates/swimlane-block.hbs"
     }
-  },
-  "request": {
-    "cert": "",
-    "key": "",
-    "passphrase": "",
-    "ca": "",
-    "proxy": ""
   },
   "logging": {
     "level": "info"
