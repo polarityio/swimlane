@@ -26,7 +26,7 @@ module.exports = {
    */
   description:
     'Search application records in Swimlane, a security automation, orchestration and incident response platform',
-  entityTypes: ['email', 'domain', 'MD5', 'SHA1', 'SHA256', 'url', 'cve'],
+  entityTypes: ['IPv4', 'IPv6', 'email', 'domain', 'MD5', 'SHA1', 'SHA256', 'url', 'cve'],
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
    * the below files can be used in your custom template.
