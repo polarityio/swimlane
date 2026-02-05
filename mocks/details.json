@@ -1,0 +1,96 @@
+{
+  "records": [
+    {
+      "appName": "Incident Management",
+      "appAcronym": "INC",
+      "appId": "a5b8c9d0-1234-5678-90ab-cdef12345678",
+      "fieldId": "f1e2d3c4-5678-90ab-cdef-1234567890ab",
+      "fieldName": "Malware Hash",
+      "layoutPath": [
+        {
+          "id": "section-001",
+          "name": "Threat Intelligence",
+          "layoutType": "section"
+        },
+        {
+          "id": "field-hash",
+          "name": "Malware Hash",
+          "layoutType": "field"
+        }
+      ],
+      "fieldValue": "5d41402abc4b2a76b9719d911017c592 - <span class=\"match\">5d41402abc4b2a76b9719d911017c592</span> found in suspicious file",
+      "recordTrackingId": "INC-2024-001",
+      "recordCreatedDate": "2024-01-15T10:30:00Z",
+      "recordModifiedDate": "2024-01-15T14:45:00Z",
+      "recordTotalTimeSpent": 3600,
+      "timeTrackingEnabled": true,
+      "modifiedByUser": "Jane Smith",
+      "createdByUser": "John Doe",
+      "recordId": "rec-abc123def456",
+      "recordUrl": "https://swimlane.example.com/record/a5b8c9d0-1234-5678-90ab-cdef12345678/rec-abc123def456"
+    },
+    {
+      "appName": "Threat Hunting",
+      "appAcronym": "TH",
+      "appId": "b6c7d8e9-2345-6789-01bc-def123456789",
+      "fieldId": "g2f3e4d5-6789-01bc-def1-234567890bcd",
+      "fieldName": "Suspicious IP Address",
+      "layoutPath": [
+        {
+          "id": "tab-001",
+          "name": "Network Indicators",
+          "layoutType": "tab"
+        },
+        {
+          "id": "section-002",
+          "name": "IP Intelligence",
+          "layoutType": "section"
+        },
+        {
+          "id": "field-ip",
+          "name": "Suspicious IP Address",
+          "layoutType": "field"
+        }
+      ],
+      "fieldValue": "IP <span class=\"match\">192.168.1.100</span> detected communicating with known C2 server",
+      "recordTrackingId": "TH-2024-042",
+      "recordCreatedDate": "2024-01-14T08:15:00Z",
+      "recordModifiedDate": "2024-01-16T11:20:00Z",
+      "recordTotalTimeSpent": 7200,
+      "timeTrackingEnabled": true,
+      "modifiedByUser": "Mike Johnson",
+      "createdByUser": "Sarah Williams",
+      "recordId": "rec-xyz789ghi012",
+      "recordUrl": "https://swimlane.example.com/record/b6c7d8e9-2345-6789-01bc-def123456789/rec-xyz789ghi012"
+    },
+    {
+      "appName": "Phishing Investigation",
+      "appAcronym": "PHISH",
+      "appId": "c7d8e9f0-3456-7890-12cd-ef1234567890",
+      "fieldId": "h3g4f5e6-7890-12cd-ef12-34567890cdef",
+      "fieldName": "Sender Email",
+      "layoutPath": [
+        {
+          "id": "section-email",
+          "name": "Email Details",
+          "layoutType": "section"
+        },
+        {
+          "id": "field-sender",
+          "name": "Sender Email",
+          "layoutType": "field"
+        }
+      ],
+      "fieldValue": "Suspicious email from <span class=\"match\">attacker@malicious-domain.com</span> with credential phishing link",
+      "recordTrackingId": "PHISH-2024-078",
+      "recordCreatedDate": "2024-01-16T06:45:00Z",
+      "recordModifiedDate": "2024-01-16T06:45:00Z",
+      "recordTotalTimeSpent": 0,
+      "timeTrackingEnabled": false,
+      "modifiedByUser": "Alex Chen",
+      "createdByUser": "Alex Chen",
+      "recordId": "rec-mno345pqr678",
+      "recordUrl": "https://swimlane.example.com/record/c7d8e9f0-3456-7890-12cd-ef1234567890/rec-mno345pqr678"
+    }
+  ]
+}

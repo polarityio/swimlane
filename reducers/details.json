@@ -1,0 +1,31 @@
+{
+  "root": {
+    "path": "",
+    "on_null": "return_empty"
+  },
+  "pipeline": [
+    {
+      "op": "copy",
+      "from": "records[].appName",
+      "to": "reduced_results.records_app_names"
+    },
+    {
+      "op": "copy",
+      "from": "records[].appAcronym",
+      "to": "reduced_results.records_app_acronyms"
+    },
+    {
+      "op": "copy",
+      "from": "records[].fieldValue",
+      "to": "reduced_results.records_field_values"
+    },
+    {
+      "op": "prune",
+      "strategy": "empty_values",
+      "target": "reduced_results"
+    }
+  ],
+  "output": {
+    "result": "$working.reduced_results"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "swimlane",
-  "version": "3.4.5",
+  "version": "3.4.6",
   "main": "./integration.js",
   "private": true,
   "license": "MIT",
